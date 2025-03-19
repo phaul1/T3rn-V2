@@ -73,7 +73,7 @@ EXECUTOR_PROCESS_PENDING_ORDERS_FROM_API=false
 EOF
 
 # Export variables from the .env file
-export $(grep -v '^#' .env | xargs)
+export $(grep -v '^#' /root/t3rn/executor/executor/bin/.env | xargs)
 
 # Start the executor inside a screen session
 screen -dmS t3rn-executor bash -c 'cd /root/t3rn/executor/executor/bin && source .env && ./executor; exec bash'
