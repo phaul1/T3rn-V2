@@ -30,13 +30,8 @@ wget "https://github.com/t3rn/executor-release/releases/download/${LATEST_VERSIO
 echo "Extracting the Executor binary..."
 tar -xzf "$EXECUTOR_FILE"
 
-# Ensure correct directory structure
-if [ -d "$T3RN_DIR/executor/executor/bin" ]; then
-    cd "$T3RN_DIR/executor/executor/bin" || exit
-else
-    echo "Error: Extracted directory structure is incorrect. Please check the archive contents."
-    exit 1
-fi
+# Ensure everything runs inside $T3RN_DIR
+cd "$T3RN_DIR" || exit
 
 # Prompt user for private key
 read -sp "Enter your private key: " PRIVATE_KEY_LOCAL
@@ -65,7 +60,7 @@ export RPC_ENDPOINTS='{
 }'
 export EXECUTOR_PROCESS_PENDING_ORDERS_FROM_API=true
 
-# Return to t3rn directory before execution
+# Ensure we are still in t3rn directory
 cd "$T3RN_DIR" || exit
 
 # Install screen if not installed
