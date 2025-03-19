@@ -63,7 +63,7 @@ LOG_PRETTY=false
 EXECUTOR_PROCESS_BIDS_ENABLED=true
 EXECUTOR_PROCESS_ORDERS_ENABLED=true
 EXECUTOR_PROCESS_CLAIMS_ENABLED=true
-PROMETHEUS_PORT=65535
+PROMETHEUS_PORT=35535
 ENABLED_NETWORKS='arbitrum-sepolia,blast-sepolia,base-sepolia,optimism-sepolia,unichain-sepolia,l2rn'
 RPC_ENDPOINTS='{
     "l2rn": ["https://b2n.rpc.caldera.xyz/http"],
