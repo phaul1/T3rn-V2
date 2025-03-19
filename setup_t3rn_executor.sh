@@ -7,7 +7,7 @@ sudo apt update && sudo apt upgrade -y
 sudo apt install -y curl wget tar screen jq
 
 # Define the t3rn directory path
-T3RN_DIR="~/t3rn"
+T3RN_DIR="$HOME/t3rn"
 
 # Remove previous t3rn installations if they exist
 if [ -d "$T3RN_DIR" ]; then
@@ -26,7 +26,8 @@ cd "$T3RN_DIR" || { echo "Failed to enter $T3RN_DIR, exiting..."; exit 1; }
 echo "Downloading the latest t3rn Executor binary..."
 LATEST_VERSION=$(curl -s https://api.github.com/repos/t3rn/executor-release/releases/latest | jq -r '.tag_name')
 EXECUTOR_FILE="executor-linux-${LATEST_VERSION}.tar.gz"
-wget "https://github.com/t3rn/executor-release/releases/download/${LATEST_VERSION}/${EXECUTOR_FILE}"
+
+wget -q --show-progress "https://github.com/t3rn/executor-release/releases/download/${LATEST_VERSION}/${EXECUTOR_FILE}"
 
 # Extract the archive
 echo "Extracting the Executor binary..."
@@ -44,8 +45,9 @@ fi
 # Navigate to executor binary directory
 cd "$EXECUTOR_BIN_DIR" || { echo "Failed to enter $EXECUTOR_BIN_DIR, exiting..."; exit 1; }
 
-# Prompt user for private key
+# Prompt user for private key securely
 read -p "Enter your private key: " PRIVATE_KEY_LOCAL
+echo -e "\nPrivate key has been set."
 echo "PRIVATE_KEY_LOCAL=$PRIVATE_KEY_LOCAL" > .env
 
 # Prompt user for maximum gas price
@@ -53,7 +55,7 @@ read -p "Enter your preferred maximum gas price in gwei (default is 100): " EXEC
 EXECUTOR_MAX_L3_GAS_PRICE=${EXECUTOR_MAX_L3_GAS_PRICE:-100}
 echo "EXECUTOR_MAX_L3_GAS_PRICE=$EXECUTOR_MAX_L3_GAS_PRICE" >> .env
 
-# Set environment variables
+# Set environment variables in .env file
 cat <<EOF >> .env
 ENVIRONMENT=testnet
 LOG_LEVEL=debug
@@ -72,10 +74,12 @@ RPC_ENDPOINTS='{
 EXECUTOR_PROCESS_PENDING_ORDERS_FROM_API=false
 EOF
 
-# Export variables from the .env file
-export $(grep -v '^#' /root/t3rn/executor/executor/bin/.env | xargs)
+# Export variables from .env file into the current shell session
+set -a  # Enable exporting variables
+source .env
+set +a  # Disable exporting variables
 
 # Start the executor inside a screen session
 screen -dmS t3rn-executor bash -c 'cd /root/t3rn/executor/executor/bin && source .env && ./executor; exec bash'
 
-echo "t3rn Executor is running in the background. Use 'screen -r t3rn-executor' to view the session."
+echo "✅ t3rn Executor is running in the background. Use 'screen -r t3rn-executor' to view the session."
