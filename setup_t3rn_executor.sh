@@ -23,14 +23,20 @@ cd "$T3RN_DIR" || exit
 # Download the latest Executor binary
 echo "Downloading the latest t3rn Executor binary..."
 LATEST_VERSION=$(curl -s https://api.github.com/repos/t3rn/executor-release/releases/latest | grep -Po '"tag_name": "\K.*?(?=")')
-wget "https://github.com/t3rn/executor-release/releases/download/${LATEST_VERSION}/executor-linux-${LATEST_VERSION}.tar.gz"
+EXECUTOR_FILE="executor-linux-${LATEST_VERSION}.tar.gz"
+wget "https://github.com/t3rn/executor-release/releases/download/${LATEST_VERSION}/${EXECUTOR_FILE}"
 
 # Extract the archive
 echo "Extracting the Executor binary..."
-tar -xzf "executor-linux-${LATEST_VERSION}.tar.gz"
+tar -xzf "$EXECUTOR_FILE"
 
-# Navigate to the executor binary location
-cd executor/executor/bin || exit
+# Ensure correct directory structure
+if [ -d "$T3RN_DIR/executor/executor/bin" ]; then
+    cd "$T3RN_DIR/executor/executor/bin" || exit
+else
+    echo "Error: Extracted directory structure is incorrect. Please check the archive contents."
+    exit 1
+fi
 
 # Prompt user for private key
 read -sp "Enter your private key: " PRIVATE_KEY_LOCAL
@@ -59,6 +65,9 @@ export RPC_ENDPOINTS='{
 }'
 export EXECUTOR_PROCESS_PENDING_ORDERS_FROM_API=true
 
+# Return to t3rn directory before execution
+cd "$T3RN_DIR" || exit
+
 # Install screen if not installed
 if ! command -v screen &> /dev/null; then
     echo "Installing screen..."
@@ -66,6 +75,6 @@ if ! command -v screen &> /dev/null; then
 fi
 
 # Start the executor inside a screen session
-screen -dmS t3rn-executor bash -c './executor; exec bash'
+screen -dmS t3rn-executor bash -c './executor/executor/bin/executor; exec bash'
 
 echo "t3rn Executor is running in the background. Use 'screen -r t3rn-executor' to view the session."
