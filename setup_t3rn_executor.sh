@@ -58,7 +58,7 @@ export RPC_ENDPOINTS='{
     "opst": ["https://sepolia.optimism.io", "https://optimism-sepolia.drpc.org"],
     "unit": ["https://unichain-sepolia.drpc.org", "https://sepolia.unichain.org"]
 }'
-export EXECUTOR_PROCESS_PENDING_ORDERS_FROM_API=true
+export EXECUTOR_PROCESS_PENDING_ORDERS_FROM_API=false
 
 # Ensure we are still in t3rn directory
 cd "$T3RN_DIR" || exit
