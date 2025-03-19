@@ -73,7 +73,7 @@ RPC_ENDPOINTS='{
     "opst": ["https://sepolia.optimism.io", "https://endpoints.omniatech.io/v1/op/sepolia/public", "https://optimism-sepolia.drpc.org"],
     "unit": ["https://unichain-sepolia.drpc.org", "https://sepolia.unichain.org"]
 }'
-EXECUTOR_PROCESS_PENDING_ORDERS_FROM_API=false
+EXECUTOR_PROCESS_PENDING_ORDERS_FROM_API=true
 EOF
 
 # Export variables from .env file into the current shell session
