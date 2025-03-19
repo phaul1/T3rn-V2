@@ -4,7 +4,7 @@
 sudo apt update && sudo apt upgrade -y
 
 # Install necessary dependencies
-sudo apt install -y curl wget git build-essential
+sudo apt install -y curl wget tar
 
 # Define the t3rn directory path
 T3RN_DIR="$HOME/t3rn"
@@ -18,49 +18,19 @@ fi
 # Recreate the t3rn directory
 echo "Creating t3rn directory..."
 mkdir -p "$T3RN_DIR"
+cd "$T3RN_DIR" || exit
 
-# Install nvm (Node Version Manager)
-if ! command -v nvm &> /dev/null; then
-    echo "Installing NVM..."
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-    source "$HOME/.nvm/nvm.sh"
-else
-    echo "NVM is already installed."
-fi
+# Download the latest Executor binary
+echo "Downloading the latest t3rn Executor binary..."
+LATEST_VERSION=$(curl -s https://api.github.com/repos/t3rn/executor-release/releases/latest | grep -Po '"tag_name": "\K.*?(?=")')
+wget "https://github.com/t3rn/executor-release/releases/download/${LATEST_VERSION}/executor-linux-${LATEST_VERSION}.tar.gz"
 
-# Install Node.js using nvm
-echo "Installing Node.js..."
-nvm install --lts
-nvm use --lts
+# Extract the archive
+echo "Extracting the Executor binary..."
+tar -xzf "executor-linux-${LATEST_VERSION}.tar.gz"
 
-# Install direnv
-if ! command -v direnv &> /dev/null; then
-    echo "Installing direnv..."
-    curl -sfL https://direnv.net/install.sh | bash
-    echo 'eval "$(direnv hook bash)"' >> ~/.bashrc
-    source ~/.bashrc
-else
-    echo "direnv is already installed."
-fi
-
-# Install pnpm (package manager)
-if ! command -v pnpm &> /dev/null; then
-    echo "Installing pnpm..."
-    npm install -g pnpm
-else
-    echo "pnpm is already installed."
-fi
-
-# Clone the t3rn executor repository
-echo "Cloning the t3rn executor repository..."
-git clone https://github.com/t3rn/executor.git "$T3RN_DIR/executor"
-
-# Navigate to the executor directory
-cd "$T3RN_DIR/executor" || exit
-
-# Install project dependencies
-echo "Installing project dependencies..."
-pnpm install
+# Navigate to the executor binary location
+cd executor/executor/bin || exit
 
 # Prompt user for private key
 read -sp "Enter your private key: " PRIVATE_KEY_LOCAL
@@ -96,6 +66,6 @@ if ! command -v screen &> /dev/null; then
 fi
 
 # Start the executor inside a screen session
-screen -dmS t3rn-executor bash -c 'pnpm start:executor; exec bash'
+screen -dmS t3rn-executor bash -c './executor; exec bash'
 
 echo "t3rn Executor is running in the background. Use 'screen -r t3rn-executor' to view the session."
